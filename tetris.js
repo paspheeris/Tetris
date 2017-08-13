@@ -40,6 +40,53 @@ function createMatrix(w, h) {
   return matrix;
 }
 
+function createPiece(type) {
+  console.log(type);
+  if (type === 'T') {
+    return [
+      [0, 0, 0],
+      [1, 1, 1],
+      [0, 1, 0]
+    ];
+  } else if (type === 'O') {
+    return [
+      [1, 1],
+      [1, 1]
+    ];
+  } else if (type === 'L') {
+      return [
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 1, 1]        
+    ];
+  } else if (type === 'J') {
+      return [
+        [0, 1, 0],
+        [0, 1, 0],
+        [1, 1, 0]        
+    ];
+  } else if (type === 'I') {
+      return [
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0],
+        [0, 1, 0, 0]                        
+    ];
+  } else if (type === 'S') {
+      return [
+        [0, 1, 1],
+        [1, 1, 0],
+        [0, 0, 0]        
+    ];
+  } else if (type === 'Z') {
+      return [
+        [1, 1, 0],
+        [0, 1, 1],
+        [0, 0, 0]        
+    ];
+  }
+}
+
 function draw() {
   context.fillStyle = '#000';
   context.fillRect(0, 0, canvas.width, canvas.height);
@@ -76,7 +123,7 @@ function playerDrop() {
   if (collide(arena, player)) {
     player.pos.y--;
     merge(arena, player);
-    player.pos.y = 0;
+    playerReset();
   }
   dropCounter = 0;
 }
@@ -88,12 +135,22 @@ function playerMove(dir) {
   }
 }
 
+function playerReset() {
+  const pieces = 'ILJOTSZ';
+  console.table(createPiece(pieces[pieces.length * Math.random() | 0]))
+  player.matrix = createPiece(pieces[pieces.length * Math.random() | 0]);
+  // console.table(player.matrix);
+  player.pos.y = 0;
+  player.pos.x = (arena[0].length / 2 | 0) - 
+  (player.matrix[0].length / 2 | 0);
+}
+
 function playerRotate(dir) {
   const pos = player.pos.x;
   let offset = 1;
   rotate(player.matrix, dir);
   //Check for wall collision
-  while (collide(arena, matrix)) {
+  while (collide(arena, player)) {
     player.pos.x += offset;
     offset = -(offset + (offset > 0 ? 1 : -1));
     if (offset > player.matrix[0].length) {
@@ -158,7 +215,7 @@ const arena = createMatrix(12, 20);
 
 const player = {
   pos: {x: 5, y: 5},
-  matrix: matrix,
+  matrix: createPiece('T'),
 }
 
 document.addEventListener('keydown', event => {
